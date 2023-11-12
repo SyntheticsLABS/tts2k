@@ -3,10 +3,10 @@
 # app.py
 import streamlit as st
 from elevenlabs import generate
-from pydub import AudioSegment
 import string
-import tempfile
 import io
+from pydub import AudioSegment
+import simpleaudio
 
 def split_sentence(sentence, max_length):
     sentences = []
@@ -47,10 +47,11 @@ def generate_audio(sentence, max_length):
     for audio_segment in audios:
         combined_audio += audio_segment
 
-    temp_audio_file = tempfile.NamedTemporaryFile(suffix='.mp3', delete=False)
-    combined_audio.export(temp_audio_file.name, format='mp3')
-
-    return temp_audio_file.name
+    # Converte para bytes e reproduz usando simpleaudio
+    audio_bytes = combined_audio.export(format='wav').read()
+    wave_obj = simpleaudio.WaveObject.from_buffer(audio_bytes, num_channels=combined_audio.channels, sample_width=combined_audio.sample_width, sample_rate=combined_audio.frame_rate)
+    play_obj = wave_obj.play()
+    play_obj.wait_done()
 
 def main():
     st.title("Gerador de Áudio")
@@ -59,8 +60,7 @@ def main():
     max_length = st.slider("Selecione o comprimento máximo de cada parte", 230, 245, value=230)
 
     if st.button("Gerar Áudio"):
-        audio_path = generate_audio(sentence, max_length)
-        st.audio(audio_path, format="audio/mp3")
+        generate_audio(sentence, max_length)
 
 if __name__ == "__main__":
     main()

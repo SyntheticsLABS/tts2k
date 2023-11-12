@@ -1,0 +1,5 @@
+streamlit==0.87.0
+elevenlabs==0.2.26
+pydub==0.25.1
+simpleaudio==1.0.4
+
